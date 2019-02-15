@@ -21,6 +21,8 @@ from langdetect import detect ## Detect Language
 import pickle ## pickle the model
 import scipy.sparse ## Convert sparse matrix to SciPy CSC matrix .npz
 
+import json # to create json object to send to the react frontend
+
 #import numpy as np
 
 
@@ -337,54 +339,78 @@ def find_similarity(test_description_modified):
     
        
     if (final_rating >= 4): 
-        selling_ability = '"Selling_Ability" : "Excellent"'
+        selling_ability = "Excellent"
     elif(final_rating >= 3 and final_rating < 4):
-        selling_ability = '"Selling_Ability" : "Good"'
+        selling_ability = "Good"
     elif(final_rating >= 2 and final_rating < 3):
-        selling_ability = '"Selling_Ability" : "Average"'
+        selling_ability = "Average"
     elif(final_rating >= 1 and final_rating < 2):
-        selling_ability = '"Selling_Ability" : "Poor"'
-    
-    
-    frontend_json = ""
+        selling_ability = "Poor"
     
     ## Making a string containing all the output data in jsonic form
-    frontend_json+= '{ "Predicted_Rating" : '  + '"' + str(round(final_rating, 2)) + '",'
-    frontend_json+= ' ' + selling_ability
-    frontend_json+= ', "Detected_Genre" : ' +  '"' + prime_genre + '",'
-    frontend_json+= ' "Total_Installs" : ' +  '"' + str(int(total_users_that_rated*factor)) + '",'
-    frontend_json+= ' "Total_Users_That_Rated" : ' +  '"' + str(int(total_users_that_rated)) + '",'
+#     frontend_json = ""
+#     frontend_json+= '{ "Predicted_Rating" : '  + '"' + str(round(final_rating, 2)) + '",'
+#     frontend_json+= ' ' + selling_ability
+#     frontend_json+= ', "Detected_Genre" : ' +  '"' + prime_genre + '",'
+#     frontend_json+= ' "Total_Installs" : ' +  '"' + str(int(total_users_that_rated*factor)) + '",'
+#     frontend_json+= ' "Total_Users_That_Rated" : ' +  '"' + str(int(total_users_that_rated)) + '",'
     
     ## changing single quotes in users_by_rating_equalized_dict keys to double quotes
-    json_graph_dict_ratings = json.dumps(users_by_rating_equalized_dict)
-    json_graph_dict_age_group = json.dumps(users_by_ageGroup_dict) 
-    frontend_json+= ' "Graph_Users_By_Ratings" : ' +  '[ ' + json_graph_dict_ratings + ' ],'
-    frontend_json+= ' "Graph_Installs_By_Age_Group" : ' +  '[ ' + json_graph_dict_age_group + ' ],'
+#     json_graph_dict_ratings = json.dumps(users_by_rating_equalized_dict)
+#     json_graph_dict_age_group = json.dumps(users_by_ageGroup_dict) 
+#     frontend_json+= ' "Graph_Users_By_Ratings" : ' +  '[ ' + json_graph_dict_ratings + ' ],'
+#     frontend_json+= ' "Graph_Installs_By_Age_Group" : ' +  '[ ' + json_graph_dict_age_group + ' ],'
     
-    
-    top_3_string_concat = "{ "
+    top3_json_object = {} 
+#     top_3_string_concat = "{ "
+
     for k in range(0, 3):
-        top_3_string_concat+='"'+'One'+str(k+1)+'" : [ '
-        #print (top_3_string_concat)
+#         top_3_string_concat+='"'+'One'+str(k+1)+'" : [ '
+#         #print (top_3_string_concat)
         top_3_document_name = track_name_array[(all_documents_similarity_sorted_topXpercent[k][1])]
         top_3_document_rating = rating_array[(all_documents_similarity_sorted_topXpercent[k][1])]
         top_3_document_rating_count = rating_count_array[(all_documents_similarity_sorted_topXpercent[k][1])]
         top_3_this_document_installs = top_3_document_rating_count*(top_3_document_rating_count/installs_factor)
-        this_description_trunc = (unmodified_description_array[(all_documents_similarity_sorted_topXpercent[k][1])][0:350]).replace("\n", " ")+"..."
-        top_3_dict_concat = '{ "Name" : "Name: '+top_3_document_name+'",  "Rating" : "Rating: '+str(top_3_document_rating)+'", "Similarity_Score" : "Similarity Score: '+str(round(all_documents_similarity_sorted_topXpercent[k][0][0][0]*100))+'%", "This_Description" : "Description: '+this_description_trunc+'" }'
-        top_3_string_concat+=top_3_dict_concat+' ]'
-        if (k!=2):   
-            top_3_string_concat+=', '
-    top_3_string_concat+= " }"
+        this_description_trunc = (unmodified_description_array[(all_documents_similarity_sorted_topXpercent[k][1])][0:350]).replace("\n", " ").replace('"', '')+"..."
+#         top_3_dict_concat = '{ "Name" : "Name: '+top_3_document_name+'",  "Rating" : "Rating: '+str(top_3_document_rating)+'", "Similarity_Score" : "Similarity Score: '+str(round(all_documents_similarity_sorted_topXpercent[k][0][0][0]*100))+'%", "This_Description" : "Description: '+this_description_trunc+'" }'
+#         top_3_string_concat+=top_3_dict_concat+' ]'
+        
+        top3_individual_json_object = {}
+        top3_individual_json_object["Name"] = top_3_document_name
+        top3_individual_json_object["Rating"] = str(top_3_document_rating)
+        top3_individual_json_object["Similarity_Score"] = "Similarity Score: " + str(round(all_documents_similarity_sorted_topXpercent[k][0][0][0]*100))+"%"
+        top3_individual_json_object["This_Description"] = "Description: " + this_description_trunc
+        
+        
+        if (k==0):
+            top3_json_object["One1"] = [top3_individual_json_object]        
+        elif (k==1):
+            top3_json_object["One2"] = [top3_individual_json_object]
+        elif (k==2):
+            top3_json_object["One3"] = [top3_individual_json_object]
+        
+#         if (k!=2):   
+#             top_3_string_concat+=', '
+#     top_3_string_concat+= " }"
     
-    frontend_json+= ' "Top_3_Similar_Apps" : ' +  '[ '+ top_3_string_concat + ' ]'
-    frontend_json+= ' }'
+#     frontend_json+= ' "Top_3_Similar_Apps" : ' +  '[ '+ top_3_string_concat + ' ]'
+#     frontend_json+= ' }'
     
     print ("FRONTEND\n")
     
-
+    json_object = {}
+    json_object["Predicted_Rating"] = str(round(final_rating, 2))
+    json_object["Selling_Ability"] = selling_ability
+    json_object["Detected_Genre"] = prime_genre
+    json_object["Total_Installs"] = str(int(total_users_that_rated*factor))
+    json_object["Total_Users_That_Rated"] = str(int(total_users_that_rated))
+    json_object["Graph_Users_By_Ratings"] = [users_by_rating_equalized_dict]
+    json_object["Graph_Installs_By_Age_Group"] = [users_by_ageGroup_dict]
+    json_object["Top_3_Similar_Apps"] = [top3_json_object]
+        
+    print ("JSON Object:", json_object)
     
-    return frontend_json
+    return json_object
     
 
 @app.route('/') 
@@ -402,40 +428,48 @@ def test(name):
 
 @app.route('/json_description', methods=['POST']) 
 def json_description():
+
+    start_time = time.time() ## start runtime for description entered
+
+    print ("Processing Started") ## prints on console
+    content = request.data ## request json data from body
+    jsondata = json.loads(content)
+    #print (content)
+    #print (jsondata)
+    #print (content['description']) ## print on console, json data which has"description" as key
+    #return jsonify(content) ## prints on browser, json syntax that was POSTed
+    #test_description = content['description']
+    test_description = jsondata['description']
+    test_description = test_description.replace("\n"," ")
+    print (test_description)
+
+
+    if detect(test_description) != 'en':
+        return "Error: Please enter plain english detailed description"
+    else:
+        ## POS Tagging and Lemmatization
+        lemmatized_Description = lemmatizeDescription(test_description)
+
+    test_description_modified = lemmatized_Description
+
+    # The following is the json output that will be sent to the frontend
+    frontend_json = find_similarity(test_description_modified)
     
-	start_time = time.time() ## start runtime for description entered
+    # Sending the json reponse to frontend
+    # Refer - https://stackoverflow.com/questions/13081532/return-json-response-from-flask-view
+    response = app.response_class(
+        response=json.dumps(frontend_json),
+        mimetype='application/json'
+    )
 
-	print ("Hey") ## prints on console
-	content = request.data ## request json data from body
-	jsondata = json.loads(content)
-	#print (content)
-	#print (jsondata)
-	#print (content['description']) ## print on console, json data which has"description" as key
-	#return jsonify(content) ## prints on browser, json syntax that was POSTed
-	#test_description = content['description']
-	test_description = jsondata['description']
-	test_description = test_description.replace("\n"," ")
-	print (test_description)
+    # 	## Dumping payload string into a json file
+    # 	payload_dump = json.dumps(frontend_json)
+    # 	## payload_dump has unnecessary '\' elements. To remove them load this json file into another json file
+    # 	payload = json.loads(payload_dump)
 
+    print("\n--- %s seconds ---" % (time.time() - start_time)) ## print runtime
 
-	if detect(test_description) != 'en':
-		return "Error: Please enter plain english detailed description"
-	else:
-		## POS Tagging and Lemmatization
-		lemmatized_Description = lemmatizeDescription(test_description)
-
-	test_description_modified = lemmatized_Description
-
-	frontend_json = find_similarity(test_description_modified)
-
-	## Dumping payload string into a json file
-	payload_dump = json.dumps(frontend_json)
-	## payload_dump has unnecessary '\' elements. To remove them load this json file into another json file
-	payload = json.loads(payload_dump)
-		
-	print("\n--- %s seconds ---" % (time.time() - start_time)) ## print runtime
-
-	return payload 
+    return response 
 
 
 
