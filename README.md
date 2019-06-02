@@ -1,4 +1,5 @@
-# Will-It-Sell (SalePredict) - Project for CmpE 272 Course Lab in the Fall 18 semester at San Jose State University
+# Will-It-Sell (SalePredict)
+Project for CmpE 272 Course Lab in the Fall 18 semester at San Jose State University
 
 ## Project Idea: Mobile Application Success Prediction System
 
