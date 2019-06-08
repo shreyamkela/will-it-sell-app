@@ -34,7 +34,7 @@ https://www.kaggle.com/ramamet4/app-store-apple-data-set-10k-apps
 https://invis.io/C7P3GP56X5K
 
 ### Technologies utilized
-Natural Language Processing, scikit-learn, NTLK, Flask, Python, Jupyter Notebook, React, Express.js, Node.js, JavaScript, HTML5, CSS3, Bootstrap, IBM Watson Cloud, InVision, REST, Anaconda
+Natural Language Processing, Machine Learning, scikit-learn, NTLK, Flask, Python, Jupyter Notebook, React, Express.js, Node.js, JavaScript, HTML5, CSS3, Bootstrap, IBM Watson Cloud, InVision, REST, Anaconda
 
 ### Team Members: 
 Shreyam Kela, Sayalee Shankar Bhusari, Harsh Agarwal, Vaishali Koul
