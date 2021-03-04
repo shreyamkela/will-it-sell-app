@@ -22,7 +22,7 @@ Ever made an app that got you pulling all-nighters for weeks, only to get the lo
 ### Natural Language Processor
 ![](https://github.com/shreyamkela/will-it-sell-app/blob/master/app-images/nlp_thumbnail.PNG)
 
-### Architechture Flow
+### Architecture Flow
 <p align="middle">
   <img src="/app-images/architechture_flow-thumbnail.PNG" />
 </p>
